@@ -23,7 +23,7 @@ response=$(curl -s -X POST "https://api.submagic.co/v1/projects/upload" \
   -F "templateName=Devin" \
   -F "magicZooms=true" \
   -F "magicBrolls=true" \
-  -F "magicBrollsPercentage=0" \
+  -F "magicBrollsPercentage=25" \
   -F "removeSilencePace=fast" \
   -F "removeBadTakes=true")
 
