@@ -54,9 +54,44 @@ curl_args=(
   --progress-bar
 )
 
-if curl --fail --show-error "${curl_args[@]}"; then
-  echo "Video uploaded successfully."
+# Capture the response
+response=$(mktemp)
+if curl --fail --show-error "${curl_args[@]}" -o "$response"; then
+  echo ""
+  echo "=========================================="
+  echo "✅ VIDEO UPLOADED SUCCESSFULLY"
+  echo "=========================================="
+  echo ""
+  
+  # Extract YouTube URL
+  youtube_url=$(jq -r '.results.youtube.url // "N/A"' "$response")
+  echo "🔗 YouTube URL: $youtube_url"
+  
+  # Extract video ID
+  post_id=$(jq -r '.results.youtube.post_id // "N/A"' "$response")
+  echo "📹 Video ID: $post_id"
+  
+  # Check if video was transcoded
+  was_transcoded=$(jq -r '.results.youtube.video_was_transcoded // false' "$response")
+  if [ "$was_transcoded" = "true" ]; then
+    echo "🔄 Transcoded: Yes"
+  else
+    echo "🔄 Transcoded: No"
+  fi
+  
+  # Display usage information
+  echo ""
+  echo "📊 API Usage:"
+  usage_count=$(jq -r '.usage.count // "N/A"' "$response")
+  usage_limit=$(jq -r '.usage.limit // "N/A"' "$response")
+  echo "   • Used: $usage_count / $usage_limit"
+  
+  echo ""
+  echo "=========================================="
+  
+  rm -f "$response"
 else
   echo "Failed to upload video."
+  rm -f "$response"
   exit 1
 fi
