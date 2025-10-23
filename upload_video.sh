@@ -51,8 +51,12 @@ curl_args=(
   -F "title=$title"
   -F "video=@$input_file"
   -F "platform[]=youtube"
+  -F "platform[]=twitter"
+  -F "platform[]=instagram"
+  -F "platform[]=facebook"
   --progress-bar
 )
+#  (e.g., "tiktok", "instagram", "linkedin", "youtube", "facebook", "twitter", "threads", "pinterest")
 
 # Capture the response
 response=$(mktemp)
