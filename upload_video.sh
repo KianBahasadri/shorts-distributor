@@ -5,6 +5,11 @@
 
 set -euo pipefail
 
+# Load environment variables
+if [ -f .env ]; then
+  source .env
+fi
+
 api_url="https://api.upload-post.com/api/upload"
 input_file=${1:-}
 title=${2:-}
@@ -33,7 +38,7 @@ fi
 echo ""
 echo "=========================================="
 echo "Title: $title"
-echo "Platform: YouTube"
+echo "Platform: YouTube, X (Twitter), Instagram, Facebook, TikTok"
 echo "File: $input_file"
 echo "=========================================="
 echo ""
@@ -51,16 +56,19 @@ curl_args=(
   -F "title=$title"
   -F "video=@$input_file"
   -F "platform[]=youtube"
-  -F "platform[]=twitter"
+  -F "platform[]=x"
   -F "platform[]=instagram"
   -F "platform[]=facebook"
+  -F "platform[]=tiktok"
   --progress-bar
 )
 #  (e.g., "tiktok", "instagram", "linkedin", "youtube", "facebook", "twitter", "threads", "pinterest")
 
 # Capture the response
 response=$(mktemp)
-if curl --fail --show-error "${curl_args[@]}" -o "$response"; then
+http_code=$(curl -w "%{http_code}" -o "$response" --show-error "${curl_args[@]}")
+
+if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
   echo ""
   echo "=========================================="
   echo "✅ VIDEO UPLOADED SUCCESSFULLY"
@@ -95,7 +103,16 @@ if curl --fail --show-error "${curl_args[@]}" -o "$response"; then
   
   rm -f "$response"
 else
-  echo "Failed to upload video."
+  echo ""
+  echo "=========================================="
+  echo "❌ Failed to upload video"
+  echo "=========================================="
+  echo "HTTP Status Code: $http_code"
+  echo ""
+  echo "API Response:"
+  cat "$response"
+  echo ""
+  echo "=========================================="
   rm -f "$response"
   exit 1
 fi
