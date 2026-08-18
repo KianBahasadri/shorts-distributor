@@ -59,6 +59,7 @@ curl_args=(
   -F "platform[]=x"
   -F "platform[]=instagram"
   -F "platform[]=facebook"
+  -F 'facebook_page_id="818964741307873"'
   -F "platform[]=tiktok"
   --progress-bar
 )
